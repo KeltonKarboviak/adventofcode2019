@@ -1,3 +1,6 @@
+import itertools
+
+
 ADD = 1
 MUL = 2
 HALT = 99
@@ -35,7 +38,38 @@ def main_part1():
 
 
 def main_part2():
-    pass
+    with open('day2.txt', 'r') as fh:
+        original_intcodes = [int(i) for i in fh.read().split(',')]
+
+    expected_answer = 19690720
+
+    for noun, verb in itertools.permutations(range(0, 100), 2):
+        intcodes = original_intcodes.copy()
+        intcodes[1] = noun
+        intcodes[2] = verb
+
+        opcodes = [(idx*4, code) for idx, code in enumerate(intcodes[::4])]
+        for idx, code in opcodes:
+            instructions = intcodes[idx:idx+4]
+            code, operand1_location, operand2_location, result_location = instructions
+            # print(idx, instructions, end=' ')
+            if code == HALT:
+                print('halt')
+                break
+
+            operand1, operand2 = intcodes[operand1_location], intcodes[operand2_location]
+
+            if code == ADD:
+                # print(f'add {operand1} + {operand2} = {operand1 + operand2} -> stored in location {result_location}')
+                intcodes[result_location] = operand1 + operand2
+            elif code == MUL:
+                # print(f'mul {operand1} * {operand2} = {operand1 * operand2} -> stored in location {result_location}')
+                intcodes[result_location] = operand1 * operand2
+
+        actual_answer = intcodes[0]
+        if expected_answer == actual_answer:
+            print(f'Hooray! Answer: noun={noun}, verb={verb}')
+            break
 
 
 if __name__ == "__main__":
